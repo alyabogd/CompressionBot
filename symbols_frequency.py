@@ -53,6 +53,23 @@ class FrequencyTable:
 
         return low_bound, high_bound
 
+    def get_symbol_by_frequency_value(self, value):
+        """
+        Uses binary search to find symbol
+        to which bounds given value belongs
+        """
+
+        l = 0
+        r = len(self.frequencies)
+        while r - l > 1:
+            middle = (r + l) // 2
+            low, high = self.get_probability_bounds(middle)
+            if value < low:
+                r = middle
+            else:
+                l = middle
+        return l
+
     def check_if_present(self, symbol_ord):
         if symbol_ord < 0 or symbol_ord >= len(self.frequencies):
             raise ValueError("Symbol ord out of range: 0 <= {} < {}"
@@ -60,8 +77,8 @@ class FrequencyTable:
 
     def append_compressed(self, out_buffer):
         width = 32
-        for freq in self.frequencies:
-            out_buffer.append_int(freq, width)
+        for i in range(256):
+            out_buffer.append_int(self.frequencies[i], width)
 
 
 def compute_frequencies(file_name):

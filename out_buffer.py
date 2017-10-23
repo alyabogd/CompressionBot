@@ -1,6 +1,6 @@
 class OutBuffer:
-    def __init__(self):
-        self.buffer = []
+    def __init__(self, out):
+        self.out_stream = open(out, "wb")
         # will hold current bits that is not enough to form a byte
         self.byte = 0
         self.bits_in_byte = 0
@@ -14,25 +14,27 @@ class OutBuffer:
             self.append_bit((value >> i) & 1)
 
     def append_bit(self, bit):
-        # add new bit to the end
+        """
+        Adds bit to temporary holder
+        Write to file if there's enough bits to form a byte
+        """
         self.byte = (self.byte << 1) | bit
         self.bits_in_byte += 1
 
         if self.bits_in_byte == 8:
             self._flush_byte()
 
-    def write_to_file(self, file_name):
-        while self.bits_in_byte != 0:
-            self.append_bit(0)
-
-        with open(file_name, "wb") as out:
-            # out.write(bytes(self.buffer))
-            for n in self.buffer:
-                out.write(n)
-
     def _flush_byte(self):
-        """Add byte to buffer and clean up"""
-        self.buffer.append(bytes((self.byte,)))
+        """Add byte to output and clean up"""
+        self.out_stream.write(bytes((self.byte,)))
 
         self.byte = 0
         self.bits_in_byte = 0
+
+    def _write_remain_bits(self):
+        while self.bits_in_byte != 0:
+            self.append_bit(0)
+
+    def finish(self):
+        self._write_remain_bits()
+        self.out_stream.close()
