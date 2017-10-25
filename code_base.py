@@ -33,7 +33,7 @@ class CodeBase:
         low = self.low
         high = self.high
 
-        range_for_old = low - high
+        range_for_old = high - low + 1
 
         self.low = low + symbol_low_bound * range_for_old // frequency_table.total_symbols
         self.high = low + symbol_high_bound * range_for_old // frequency_table.total_symbols - 1

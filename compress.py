@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     # Handle command line arguments
     if len(args) != 2:
-        sys.exit("Usage: python arithmetic-compress.py InputFile OutputFile")
+        sys.exit("Usage: compress.py InputFile OutputFile")
 
     in_file = args[0]
     out_file = args[1]
