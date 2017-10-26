@@ -2,9 +2,9 @@
 
 import sys
 
-from arithmetic_coding.decode import Decoder
-from byte_io.buffered_in_stream import InBuffer
-from symbols_frequency import FrequencyTable
+from compression.arithmetic_coding.decode import Decoder
+from compression.byte_io import InBuffer
+from compression.symbols_frequency import FrequencyTable
 
 
 def read_frequencies(in_buffer):
