@@ -1,6 +1,6 @@
 """Module with basic decoding algorithm implementation"""
 
-from compression.arithmetic_coding import CodeBase
+from compression.arithmetic_coding.code_base import CodeBase
 
 
 class Decoder(CodeBase):

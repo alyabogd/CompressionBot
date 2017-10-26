@@ -3,7 +3,7 @@
 import sys
 
 from compression.arithmetic_coding.decode import Decoder
-from compression.byte_io import InBuffer
+from compression.byte_io.buffered_in_stream import InBuffer
 from compression.symbols_frequency import FrequencyTable
 
 
@@ -18,12 +18,7 @@ def read_frequencies(in_buffer):
     return freqs
 
 
-def main(args):
-    # Handle command line arguments
-    if len(args) != 2:
-        sys.exit("Usage: decompress.py InputFile OutputFile")
-    in_file = args[0]
-    out_file = args[1]
+def main(in_file, out_file):
     in_buffer = InBuffer(in_file)
     # read and build frequency table from compressed file
     frequencies = read_frequencies(in_buffer)
@@ -34,4 +29,9 @@ def main(args):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    main(args)
+
+    # Handle command line arguments
+    if len(args) != 2:
+        sys.exit("Usage: decompress.py InputFile OutputFile")
+
+    main(*args)
