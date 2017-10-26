@@ -1,6 +1,6 @@
 """Module with basic decoding algorithm implementation"""
 
-from code_base import CodeBase
+from arithmetic_coding.code_base import CodeBase
 
 
 class Decoder(CodeBase):
@@ -55,7 +55,7 @@ class Decoder(CodeBase):
         self.current_symbol_code = ((self.current_symbol_code << 1) & self.STATE_MASK) | bit
 
     def _process_pending_bit(self):
-        """Handle this"""
+        """Handle case when range bound were too close"""
         bit = self.in_buffer.read_bit()
         if bit == -1:
             bit = 0

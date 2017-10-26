@@ -5,13 +5,13 @@ class CodeBase:
     # Maximum number of bits in state
     STATE_SIZE_IN_BITS = 32
 
-    # Mask of STATE_BITS ones: 1111... (also the highest value of state)
+    # Mask of STATE_SIZE_IN_BITS ones: 1111... (also the highest value of state)
     STATE_MASK = (1 << STATE_SIZE_IN_BITS) - 1
 
-    # Mask to get top bit of state (10000... width=STATE_BITS )
+    # Mask to get top bit of state (10000... width=STATE_SIZE_IN_BITS )
     TOP_BIT = 1 << (STATE_SIZE_IN_BITS - 1)
 
-    # Mask to get second top bit of state (01000... width=STATE_BITS )
+    # Mask to get second top bit of state (01000... width=STATE_SIZE_IN_BITS )
     SECOND_BIT = TOP_BIT >> 1
 
     def __init__(self):
@@ -77,4 +77,3 @@ class CodeBase:
 
     def _process_pending_bit(self):
         raise NotImplementedError()
-

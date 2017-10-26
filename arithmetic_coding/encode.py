@@ -1,8 +1,6 @@
 """Module with basic encoding algorithm implementation"""
 
-from symbols_frequency import FrequencyTable
-from out_buffer import OutBuffer
-from code_base import CodeBase
+from arithmetic_coding.code_base import CodeBase
 
 
 class Encoder(CodeBase):
