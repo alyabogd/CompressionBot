@@ -45,6 +45,9 @@ class FrequencyTable:
         return self.frequencies[symbol_ord]
 
     def get_probability_bounds(self, symbol_ord):
+        if symbol_ord == 0:
+            return 0, self.scale[0]
+
         self.check_if_present(symbol_ord)
 
         # the last symbol is emulated and it's frequency == 0

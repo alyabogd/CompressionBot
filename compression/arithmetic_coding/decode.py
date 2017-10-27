@@ -30,7 +30,7 @@ class Decoder(CodeBase):
         """
         Get new symbol and update state based on given frequency table
         """
-        old_range = self.high - self.low
+        old_range = self.high - self.low + 1
         offset = self.current_symbol_code - self.low
         value = ((offset + 1) * frequency_table.total_symbols - 1) // old_range
 

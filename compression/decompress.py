@@ -20,9 +20,11 @@ def read_frequencies(in_buffer):
 
 def main(in_file, out_file):
     in_buffer = InBuffer(in_file)
+
     # read and build frequency table from compressed file
     frequencies = read_frequencies(in_buffer)
     frequency_table = FrequencyTable(frequencies)
+
     decoder = Decoder()
     decoder.decode(in_buffer, out_file, frequency_table)
 
