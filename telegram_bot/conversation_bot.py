@@ -125,6 +125,10 @@ def unknown(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text=Config.UNKNOWN_COMMAND_MESSAGE)
 
 
+def help_handler(bot, update):
+    bot.send_message(chat_id=update.message.chat_id, text=Config.HOW_TO_USE)
+
+
 def main():
     updater = Updater(token=Config.BOT_TOKEN)
     dispatcher = updater.dispatcher
@@ -132,6 +136,7 @@ def main():
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(MessageHandler(Filters.document, files_handler))
     dispatcher.add_handler(CommandHandler('scan', web_page_handler, pass_args=True))
+    dispatcher.add_handler(CommandHandler('help', help_handler))
     dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 
     updater.start_polling()
