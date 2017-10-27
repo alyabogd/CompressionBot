@@ -12,3 +12,5 @@ class Config:
 
     DECOMPRESS_STARTED_MESSAGE = "Decompressing {file_name}..."
     COMPRESS_STARTED_MESSAGE = "Compressing {file_name}..."
+
+    DONE_MASSAGE = "Done"
