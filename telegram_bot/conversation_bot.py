@@ -6,6 +6,7 @@ from telegram import ChatAction
 
 from compression import decompress, compress
 from telegram_bot.configs import Config
+from telegram_bot.web_parser import get_links_to_text_files, download_text_file
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -65,6 +66,37 @@ def files_handler(bot, update):
     os.remove(out_file)
 
 
+def web_page_handler(bot, update, args):
+    if len(args) < 1:
+        update.message.reply_text(Config.NO_WEB_ADDRESS_FOUND)
+        return
+
+    web_address = args[0]
+    logging.info("Start parsing {}".format(web_address))
+    text_links = get_links_to_text_files(web_address)
+
+    logging.info("Got {} links from {}".format(len(text_links), web_address))
+    update.message.reply_text(Config.WEB_SCAN_RESULT.format(len(text_links)))
+
+    for file in text_links:
+        logging.info("start processing {}".format(file))
+        update.message.reply_text(Config.FILE_DOWNLOADING_MESSAGE.format(file))
+        in_file = download_text_file(web_address, file)
+
+        update.message.reply_text(Config.COMPRESS_STARTED_MESSAGE.format(file_name=in_file))
+        logging.info("compressing {}".format(in_file))
+        out_file = _compress(in_file)
+
+        update.message.reply_text(Config.DONE_MASSAGE)
+        logging.info("finish {}".format(in_file))
+
+        bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
+        _send_file(bot, update.message.chat_id, out_file)
+
+        os.remove(in_file)
+        os.remove(out_file)
+
+
 def unknown(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text=Config.UNKNOWN_COMMAND_MESSAGE)
 
@@ -75,6 +107,7 @@ def main():
 
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(MessageHandler(Filters.document, files_handler))
+    dispatcher.add_handler(CommandHandler('scan', web_page_handler, pass_args=True))
     dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 
     updater.start_polling()

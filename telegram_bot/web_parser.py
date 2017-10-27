@@ -1,6 +1,6 @@
 """Parses given web page and returns all text files found"""
 
-from urllib.request import urlopen
+from urllib.request import urlopen, URLopener
 import re
 
 
@@ -15,7 +15,7 @@ def _get_href(link):
     href = None
     if s is not None:
         href = s.group(1)
-        brakets_pattern = "('|\")([^'\"]*)('|\")"
+        brakets_pattern = "('|\")/*([^'\"]*)('|\")"
         m = re.match(brakets_pattern, href)
         if m:
             href = m.group(2)
@@ -43,3 +43,21 @@ def get_links_to_text_files(web_address):
         line = line.decode("utf-8")
         text_links.extend(_get_text_links(line))
     return text_links
+
+
+def _is_absolute_link(name):
+    return name.startswith("www.") or name.startswith("http://")
+
+
+def download_text_file(url, file_name):
+    opener = URLopener()
+    if _is_absolute_link(file_name):
+        url = file_name
+        if not url.startswith("http://"):
+            url = "http://" + url
+        out_name = file_name.split("/")[-1]
+    else:
+        url = "{}{}".format(url, file_name)
+        out_name = file_name
+    opener.retrieve(url, out_name)
+    return out_name
