@@ -1,4 +1,4 @@
-# CompressionAlgorithm
+# Compression Bot
 
 Compressing text files via telegram bot.  
 
