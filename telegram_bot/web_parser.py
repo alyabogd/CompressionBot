@@ -51,6 +51,7 @@ def _is_absolute_link(name):
 
 def download_text_file(url, file_name):
     opener = URLopener()
+    file_name = file_name.split("/")[-1]
     if _is_absolute_link(file_name):
         url = file_name
         if not url.startswith("http://"):
@@ -59,5 +60,5 @@ def download_text_file(url, file_name):
     else:
         url = "{}{}".format(url, file_name)
         out_name = file_name
-    opener.retrieve(url, out_name)
+    opener.retrieve(url, file_name)
     return out_name
