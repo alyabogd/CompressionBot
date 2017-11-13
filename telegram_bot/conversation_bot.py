@@ -1,13 +1,14 @@
 import logging
 import os
 
-from telegram.ext import Updater, CommandHandler, Filters, MessageHandler
 from telegram import ChatAction
+from telegram.ext import Updater, CommandHandler, Filters, MessageHandler
 
-from compression import decompress, compress
+import compress
+import decompress
+from telegram_bot.checker import files_equal
 from telegram_bot.configs import Config
 from telegram_bot.web_parser import get_links_to_text_files, download_text_file
-from telegram_bot.checker import files_equal
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)

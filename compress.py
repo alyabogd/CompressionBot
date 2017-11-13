@@ -26,6 +26,6 @@ if __name__ == "__main__":
 
     # Handle command line arguments
     if len(args) != 2:
-        sys.exit("Usage: decompress.py InputFile OutputFile")
+        sys.exit("Usage: compress.py InputFile OutputFile")
 
     main(*args)
