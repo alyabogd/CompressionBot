@@ -45,6 +45,9 @@ def _compress(from_file, to_file=None):
         to_file = "{}.in".format(".".join(from_file.split(".")[:-1]))
     logging.debug("compressing {} -> {}".format(from_file, to_file))
     compress.main(from_file, to_file)
+    from_size = os.path.getsize(from_file)
+    to_size = os.path.getsize(to_file)
+    logging.info("compressed: {} -> {} : {}%".format(from_size, to_size, (1.0 * to_size / from_size)))
     return to_file
 
 
