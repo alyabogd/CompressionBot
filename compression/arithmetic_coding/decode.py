@@ -44,19 +44,19 @@ class Decoder(CodeBase):
         """Reads STATE_SIZE_IN_BITS bits in buffer"""
         self.current_symbol_code = 0
         for _ in range(CodeBase.STATE_SIZE_IN_BITS):
-            bit = self.in_buffer.read_bit()
+            bit = self.in_buffer.take_next_bit()
             self.current_symbol_code = (self.current_symbol_code << 1) | bit
 
     def _process_top_bit(self):
         """Shift existing symbol_code and read one more bit"""
-        bit = self.in_buffer.read_bit()
+        bit = self.in_buffer.take_next_bit()
         if bit == -1:
             bit = 0
         self.current_symbol_code = ((self.current_symbol_code << 1) & self.STATE_MASK) | bit
 
     def _process_pending_bit(self):
         """Handle case when range bound were too close"""
-        bit = self.in_buffer.read_bit()
+        bit = self.in_buffer.take_next_bit()
         if bit == -1:
             bit = 0
         self.current_symbol_code = ((self.current_symbol_code & CodeBase.TOP_BIT) |

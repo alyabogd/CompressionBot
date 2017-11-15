@@ -11,17 +11,22 @@ class InBuffer:
         self.pending_bits_in_byte = 0
 
         self.is_eof = False
+        self.buffer = None
 
-    def read_bit(self):
+    def read(self, bytes_num=-1):
+        """Reads bytes_num bytes from file into buffer"""
+        self.buffer = self.in_stream.read(bytes_num).__iter__()
+
+    def take_next_bit(self):
+        """Takes next bit from buffer. Returns -1 if there isn't any"""
         if self.is_eof:
             return -1
         if self.pending_bits_in_byte == 0:
-            # need to read one more byte
-            self.byte = self.in_stream.read(1)
-            if len(self.byte) == 0:
+            try:
+                self.byte = self.buffer.__next__()
+            except StopIteration:
                 self.is_eof = True
                 return -1
-            self.byte = ord(self.byte)
             self.pending_bits_in_byte = 8
 
         self.pending_bits_in_byte -= 1
@@ -29,12 +34,12 @@ class InBuffer:
 
     def read_int(self, width_in_bits):
         """
-        Reads width_in_bits bits from in_stream
+        Reads width_in_bits bits from buffer
         Returns integer value of bits read
         """
         value = 0
         for i in range(width_in_bits):
-            bit = self.read_bit()
+            bit = self.take_next_bit()
             value = (value << 1) | bit
         return value
 
