@@ -6,8 +6,6 @@ class FrequencyTable:
     self.frequencies - list of frequencies for each input byte
                     Keys are int numbers for corresponding bytes
                     Since byte's range is [0, 255] => max_length = 256
-
-    self.scale -
     """
 
     def __init__(self, symbols_frequencies):
@@ -84,19 +82,16 @@ class FrequencyTable:
             out_buffer.append_int(self.frequencies[i], width)
 
 
-def compute_frequencies(file_name):
+def compute_frequencies(text):
     """
-    Reads input file per bytes
+    Text is considered to be a byte array
     Computes frequencies of each input byte
     """
     frequencies = [0 for _ in range(257)]
 
-    with open(file_name, "rb") as inp:
-        b = inp.read(1)
-        while len(b) != 0:
-            b_ord = ord(b)
-            frequencies[b_ord] += 1
-            b = inp.read(1)
+    for byte in text:
+        frequencies[byte] += 1
+
     # EOF symbol
     frequencies[256] += 1
     return frequencies

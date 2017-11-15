@@ -11,19 +11,17 @@ class Encoder(CodeBase):
 
         self.bits_pending = 0
 
-    def compress(self, file_name, frequencies_table):
+    def compress(self, text, frequencies_table):
         """
-        Performs compression of text in file_name
-        in out_buffer based on given frequencies_table
+        Performs compression of given text in
+        out_buffer based on given frequencies_table
+        Text is considered to be a byte array
         """
         self.frequencies_table = frequencies_table
 
-        with open(file_name, "rb") as inp:
-            b = inp.read(1)
-            while len(b) > 0:
-                b_ord = ord(b)
-                self.update_state(b_ord, self.frequencies_table)
-                b = inp.read(1)
+        for byte in text:
+            self.update_state(byte, self.frequencies_table)
+
         # write EOF
         self.update_state(256, self.frequencies_table)
         self.out_buffer.append_bit(1)

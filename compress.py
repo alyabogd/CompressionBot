@@ -7,9 +7,19 @@ from compression.byte_io.buffered_out_stream import OutBuffer
 from compression.symbols_frequency import FrequencyTable, compute_frequencies
 
 
+def get_text_as_bytes(file_name):
+    text = []
+    with open(file_name, "rb") as inp:
+        text = inp.read()
+    return text
+
+
 def main(in_file, out_file):
-    # compute frequency table for input file
-    frequencies = compute_frequencies(in_file)
+
+    text = get_text_as_bytes(in_file)
+
+    # compute frequency table for input text
+    frequencies = compute_frequencies(text)
     frequency_table = FrequencyTable(frequencies)
 
     out_buffer = OutBuffer(out_file)
@@ -18,7 +28,7 @@ def main(in_file, out_file):
     frequency_table.append_compressed(out_buffer)
 
     encoder = Encoder(out_buffer)
-    encoder.compress(in_file, frequency_table)
+    encoder.compress(text, frequency_table)
 
 
 if __name__ == "__main__":
