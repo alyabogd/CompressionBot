@@ -1,9 +1,11 @@
 class OutBuffer:
-    def __init__(self, out):
-        self.out_stream = open(out, "wb")
+    def __init__(self, out_name):
+        self.out_name = out_name
         # will hold current bits that is not enough to form a byte
         self.byte = 0
         self.bits_in_byte = 0
+
+        self.to_write = bytearray()
 
     def append_int(self, value, width_in_bits):
         """
@@ -26,15 +28,18 @@ class OutBuffer:
 
     def _flush_byte(self):
         """Add byte to output and clean up"""
-        self.out_stream.write(bytes((self.byte,)))
+        self.to_write.append(self.byte)
 
         self.byte = 0
         self.bits_in_byte = 0
 
-    def _write_remain_bits(self):
+    def _append_remain_bits(self):
         while self.bits_in_byte != 0:
             self.append_bit(0)
 
-    def finish(self):
-        self._write_remain_bits()
-        self.out_stream.close()
+    def perform_write(self):
+        self._append_remain_bits()
+
+        with open(self.out_name, "wb") as out_stream:
+            for byte in self.to_write:
+                out_stream.write(bytes((byte,)))

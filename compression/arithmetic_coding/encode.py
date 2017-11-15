@@ -25,7 +25,7 @@ class Encoder(CodeBase):
         # write EOF
         self.update_state(256, self.frequencies_table)
         self.out_buffer.append_bit(1)
-        self.out_buffer.finish()
+        self.out_buffer.perform_write()
 
     def _process_pending_bit(self):
         self.bits_pending += 1
