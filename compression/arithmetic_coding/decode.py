@@ -18,6 +18,7 @@ class Decoder(CodeBase):
 
         self.in_buffer = in_buffer
 
+        self.reset_range()
         self._read_buffer_initially()
 
         with open(out_file, "wb") as out:
@@ -25,6 +26,9 @@ class Decoder(CodeBase):
             while symbol != 256:
                 out.write(bytes((symbol,)))
                 symbol = self._decode_next_symbol(frequency_table)
+
+        self.in_buffer.take_next_bit()
+        self.in_buffer.shift_to_next_byte()
 
     def _decode_next_symbol(self, frequency_table):
         """

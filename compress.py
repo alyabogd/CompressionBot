@@ -14,28 +14,49 @@ def get_text_as_bytes(file_name):
     return text
 
 
-def main(in_file, out_file):
+def main(in_file, *files, out_file="compressed.txt"):
+    """
+    Structure of compressed file:
+    16 bits: number of files compressed - n
+    n times (mapping):
+          8 bits: len of file_name
+          file_name
+    n compressed files:
+        256 * 32 bits: frequencies
+        compressed content
+    """
 
-    text = get_text_as_bytes(in_file)
+    out_buffer = OutBuffer()
 
-    # compute frequency table for input text
-    frequencies = compute_frequencies(text)
-    frequency_table = FrequencyTable(frequencies)
+    num_of_files = len(files) + 1
+    out_buffer.append_int(num_of_files, 16)
 
-    out_buffer = OutBuffer(out_file)
+    mapping = []
 
-    # append frequency to the compressed file
-    frequency_table.append_compressed(out_buffer)
+    content_out_buffer = OutBuffer()
+    content_encoder = Encoder(content_out_buffer)
 
-    encoder = Encoder(out_buffer)
-    encoder.compress(text, frequency_table)
+    for file in (in_file, *files):
+        text = get_text_as_bytes(file)
+
+        # compute frequency table for input text
+        frequencies = compute_frequencies(text)
+        frequency_table = FrequencyTable(frequencies)
+
+        # append frequency to the compressed file
+        frequency_table.append_compressed(content_out_buffer)
+        content_encoder.compress(text, frequency_table)
+
+        mapping.append(file)
+
+    for name in mapping:
+        out_buffer.append_int(len(name), 8)
+        out_buffer.append_bytes(bytes(name, "utf-8"))
+
+    out_buffer.append_bytes(content_out_buffer.get_buffered_bytes())
+    out_buffer.perform_write(out_file)
 
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-
-    # Handle command line arguments
-    if len(args) != 2:
-        sys.exit("Usage: compress.py InputFile OutputFile")
-
     main(*args)
