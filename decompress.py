@@ -56,7 +56,7 @@ def main(in_file):
         decoder = Decoder()
         decoder.decode(file_content_buffer, name, frequency_table)
 
-    return files_mapping
+    return [file[0] for file in files_mapping]
 
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@ class Config:
     UNKNOWN_COMMAND_MESSAGE = "Sorry, I don't understand this command"
     FILE_UPLOADED_MESSAGE = "File successfully uploaded"
     FILE_DOWNLOADING_MESSAGE = "Downloading {}"
+    FILES_DOWNLOADED_STATUS = "Files successfully downloaded"
 
     DECOMPRESS_STARTED_MESSAGE = "Decompressing {file_name}..."
     COMPRESS_STARTED_MESSAGE = "Compressing {file_name}..."

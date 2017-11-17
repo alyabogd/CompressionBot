@@ -28,27 +28,30 @@ def _download_file(bot, document):
     return file_name
 
 
-def _send_file(bot, chat_id, file_name):
-    bot.send_document(chat_id=chat_id, document=open(file_name, "rb"))
+def _send_files(bot, chat_id, file_name, *names):
+    for name in (file_name, *names):
+        logging.info("Sending {}".format(name))
+        bot.send_document(chat_id=chat_id, document=open(name, "rb"))
 
 
-def _decompress(from_file, to_file=None):
-    if not to_file:
-        to_file = "{}.txt".format(".".join(from_file.split(".")[:-1]))
-    logging.debug("decompressing {} -> {}".format(from_file, to_file))
-    decompress.main(from_file, to_file)
-    return to_file
+def _decompress(from_file):
+    logging.debug("decompressing {}".format(from_file))
+    return decompress.main(from_file)
 
 
-def _compress(from_file, to_file=None):
+def _compress(from_file, *files, to_file=None):
     if not to_file:
         to_file = "{}.in".format(".".join(from_file.split(".")[:-1]))
-    logging.debug("compressing {} -> {}".format(from_file, to_file))
-    compress.main(from_file, to_file)
-    from_size = os.path.getsize(from_file)
+
+    logging.debug("compressing started")
+    compress.main(from_file, *files, out_file=to_file)
+
+    from_size = 0
+    for file in (from_file, *files):
+        from_size += os.path.getsize(file)
     to_size = os.path.getsize(to_file)
     logging.info("compressed: {} -> {} : {}%".format(from_size, to_size, (1.0 * to_size / from_size)))
-    return to_file
+    return [to_file]
 
 
 def files_handler(bot, update):
@@ -60,30 +63,33 @@ def files_handler(bot, update):
     file_type = in_file.split(".")[-1]
     if file_type in Config.compressed_types:
         update.message.reply_text(Config.DECOMPRESS_STARTED_MESSAGE.format(file_name=in_file))
-        out_file = _decompress(in_file)
+        out_names = _decompress(in_file)
     else:
         update.message.reply_text(Config.COMPRESS_STARTED_MESSAGE.format(file_name=in_file))
-        out_file = _compress(in_file)
+        out_names = _compress(in_file)
 
     update.message.reply_text(Config.DONE_MASSAGE)
     logging.info("processed {}".format(in_file))
 
     bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
-    _send_file(bot, update.message.chat_id, out_file)
+    _send_files(bot, update.message.chat_id, *out_names)
 
     os.remove(in_file)
-    os.remove(out_file)
+    for file in out_names:
+        os.remove(file)
 
 
-def _check_compression(full_file, compressed_file):
-    logging.debug("Checking {} -> {}".format(full_file, compressed_file))
-    decompressed = _decompress(compressed_file, "check.txt")
-    if files_equal(full_file, "check.txt"):
-        logging.debug("correct")
-    else:
-        logging.error("error found {} -> {}".format(full_file, compressed_file))
+def _check_compression(full_files, compressed_file):
+    logging.debug("Checking  -> {}".format(compressed_file))
+    decompressed_names = _decompress(compressed_file)
 
-    os.remove(decompressed)
+    for initial, decoded in zip(full_files, decompressed_names):
+        if files_equal(initial, decoded):
+            logging.debug("correct")
+        else:
+            logging.error("error found {} -> {}".format(initial, decoded))
+
+        os.remove(decoded)
 
 
 def web_page_handler(bot, update, args):
@@ -104,25 +110,57 @@ def web_page_handler(bot, update, args):
     logging.debug("Got {} links from {}".format(len(text_links), web_address))
     update.message.reply_text(Config.WEB_SCAN_RESULT.format(len(text_links)))
 
+    file_names = download_files(text_links, web_address)
+    update.message.reply_text(Config.FILES_DOWNLOADED_STATUS)
+
+    compressed_file_name = "archive.in"
+    _compress(*file_names, to_file=compressed_file_name)
+
+    update.message.reply_text(Config.DONE_MASSAGE)
+
+    bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
+    _send_files(bot, update.message.chat_id, compressed_file_name)
+
+    if debug:
+        _check_compression(file_names, compressed_file_name)
+
+    logging.info("Done processing {}".format(compressed_file_name))
+
+    for file in file_names:
+        os.remove(file)
+    os.remove(compressed_file_name)
+
+    logging.info("Removed all temp files")
+
+
+    # for file in text_links:
+    #     logging.info("start processing {}".format(file))
+    #     update.message.reply_text(Config.FILE_DOWNLOADING_MESSAGE.format(file))
+    #     in_file = download_text_file(web_address, file)
+    #
+    #     update.message.reply_text(Config.COMPRESS_STARTED_MESSAGE.format(file_name=in_file))
+    #     out_file = _compress(in_file)
+    #
+    #     update.message.reply_text(Config.DONE_MASSAGE)
+    #
+    #     bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
+    #     _send_file(bot, update.message.chat_id, out_file)
+    #
+    #     if debug:
+    #         _check_compression(in_file, out_file)
+    #
+    #     logging.info("Done processing {}".format(file))
+    #     os.remove(in_file)
+    #     os.remove(out_file)
+
+
+def download_files(text_links, web_address):
+    file_names = []
     for file in text_links:
-        logging.info("start processing {}".format(file))
-        update.message.reply_text(Config.FILE_DOWNLOADING_MESSAGE.format(file))
-        in_file = download_text_file(web_address, file)
-
-        update.message.reply_text(Config.COMPRESS_STARTED_MESSAGE.format(file_name=in_file))
-        out_file = _compress(in_file)
-
-        update.message.reply_text(Config.DONE_MASSAGE)
-
-        bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
-        _send_file(bot, update.message.chat_id, out_file)
-
-        if debug:
-            _check_compression(in_file, out_file)
-
-        logging.info("Done processing {}".format(file))
-        os.remove(in_file)
-        os.remove(out_file)
+        file_name = download_text_file(web_address, file)
+        file_names.append(file_name)
+        logging.info("downloaded: {}".format(file_name))
+    return file_names
 
 
 def unknown(bot, update):
