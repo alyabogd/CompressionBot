@@ -11,9 +11,9 @@ Feel free to use scripts to compress or decompress your files from the command l
 
 Example:
 
-    `compress.py InFile CompressedFile`
+    `compress.py InFile [, otherFiles]`
   
-    `decompress.py CompressedFile OutFile`
+    `decompress.py CompressedFile`
 
 
 You can also use telegram bot, which has some other useful features such as compressing all text files found on a given web-page.
