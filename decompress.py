@@ -61,4 +61,8 @@ def main(in_file):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    main(*args)
+
+    if len(args) == 0 or len(args) > 1:
+        sys.exit("Usage: CompressedFile")
+
+    main(args[0])

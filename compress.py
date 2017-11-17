@@ -1,6 +1,7 @@
 """Main module for compressing"""
 
 import sys
+import os
 
 from compression.arithmetic_coding.encode import Encoder
 from compression.byte_io.buffered_out_stream import OutBuffer
@@ -69,4 +70,18 @@ def main(in_file, *files, out_file="compressed.txt"):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    main(*args)
+
+    if len(args) == 0:
+        sys.exit("Usage: InputFile [, files]")
+
+    if len(args) == 1:
+        out_name = ".".join(args[0].split(".")[:-1]) + ".in"
+        main(args[0], out_file=out_name)
+        print("Compressed: {}".format(out_name))
+        sys.exit()
+
+    folder_path = os.path.dirname(os.path.realpath(__file__))
+    folder_name = os.path.basename(folder_path)
+    out_name = os.path.join(folder_path, folder_name) + ".in"
+    main(*args, out_file=out_name)
+    print("Compressed: {}".format(folder_name + ".in"))
