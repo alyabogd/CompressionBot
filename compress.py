@@ -21,6 +21,7 @@ def main(in_file, *files, out_file="compressed.txt"):
     n times (mapping):
           8 bits: len of file_name
           file_name
+          32 bits: size of compressed file (in bytes)
     n compressed files:
         256 * 32 bits: frequencies
         compressed content
@@ -34,10 +35,14 @@ def main(in_file, *files, out_file="compressed.txt"):
     mapping = []
 
     content_out_buffer = OutBuffer()
-    content_encoder = Encoder(content_out_buffer)
 
     for file in (in_file, *files):
+        if len(file) == 0:
+            continue
+
         text = get_text_as_bytes(file)
+
+        content_out_buffer.set_bytes_counter(0)
 
         # compute frequency table for input text
         frequencies = compute_frequencies(text)
@@ -45,13 +50,18 @@ def main(in_file, *files, out_file="compressed.txt"):
 
         # append frequency to the compressed file
         frequency_table.append_compressed(content_out_buffer)
+        content_encoder = Encoder(content_out_buffer)
         content_encoder.compress(text, frequency_table)
 
-        mapping.append(file)
+        file_size_in_bytes = content_out_buffer.get_bytes_counter()
 
-    for name in mapping:
+        mapping.append((file, file_size_in_bytes))
+
+    for name, length in mapping:
         out_buffer.append_int(len(name), 8)
         out_buffer.append_bytes(bytes(name, "utf-8"))
+        out_buffer.append_int(length, 32)
+    out_buffer.append_remain_bits()
 
     out_buffer.append_bytes(content_out_buffer.get_buffered_bytes())
     out_buffer.perform_write(out_file)

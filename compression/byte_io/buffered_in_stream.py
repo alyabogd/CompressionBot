@@ -2,22 +2,23 @@
 
 
 class InBuffer:
-    def __init__(self, in_file):
-        # read stream to compressed file
-        self.in_stream = open(in_file, "rb")
+    def __init__(self, in_file=None, data=None):
+        """Initialize in_buffer with either file content or bytes array"""
+        self.buffer = None
 
-        # byte buffer
+        if in_file is not None:
+            with open(in_file, "rb") as inp:
+                self.buffer = inp.read().__iter__()
+
+        if data is not None:
+            self.buffer = data.__iter__()
+
+        # buffer for current byte
         self.byte = 0
         self.pending_bits_in_byte = 0
 
         self.is_eof = False
-        self.buffer = None
-
         self.bytes_read = 0
-
-    def read(self, bytes_num=-1):
-        """Reads bytes_num bytes from file into buffer"""
-        self.buffer = self.in_stream.read(bytes_num).__iter__()
 
     def take_next_bit(self):
         """Takes next bit from buffer. Returns -1 if there isn't any"""
@@ -56,6 +57,3 @@ class InBuffer:
         """Skip remain bits in current byte"""
         while self.pending_bits_in_byte != 0:
             self.take_next_bit()
-
-    def close(self):
-        self.in_stream.close()

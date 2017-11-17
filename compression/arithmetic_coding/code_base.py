@@ -44,10 +44,6 @@ class CodeBase:
         # check if values of low and high are close but top bits are different
         self._check_converging()
 
-    def reset_range(self):
-        self.low = 0
-        self.high = CodeBase.STATE_MASK
-
     def _check_most_significant_bits(self):
         """
         Since low bound only increases and high bound only decreases

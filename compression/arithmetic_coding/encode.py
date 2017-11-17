@@ -18,7 +18,6 @@ class Encoder(CodeBase):
         Text is considered to be a byte array
         """
 
-        self.reset_range()
         self.frequencies_table = frequencies_table
 
         for byte in text:
@@ -28,8 +27,6 @@ class Encoder(CodeBase):
         self.update_state(256, self.frequencies_table)
         self.out_buffer.append_bit(1)
         self.out_buffer.append_remain_bits()
-
-        self.out_buffer.append_int(0, 32)
 
     def _process_pending_bit(self):
         self.bits_pending += 1

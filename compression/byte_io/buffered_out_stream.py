@@ -40,12 +40,6 @@ class OutBuffer:
     def set_bytes_counter(self, n):
         self.bytes_counter = n
 
-    def clear(self):
-        self.byte = 0
-        self.bits_in_byte = 0
-        self.to_write = bytearray()
-        self.bytes_counter = 0
-
     def _flush_byte(self):
         """Add byte to output and clean up"""
         self.to_write.append(self.byte)
