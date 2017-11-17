@@ -133,27 +133,6 @@ def web_page_handler(bot, update, args):
     logging.info("Removed all temp files")
 
 
-    # for file in text_links:
-    #     logging.info("start processing {}".format(file))
-    #     update.message.reply_text(Config.FILE_DOWNLOADING_MESSAGE.format(file))
-    #     in_file = download_text_file(web_address, file)
-    #
-    #     update.message.reply_text(Config.COMPRESS_STARTED_MESSAGE.format(file_name=in_file))
-    #     out_file = _compress(in_file)
-    #
-    #     update.message.reply_text(Config.DONE_MASSAGE)
-    #
-    #     bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
-    #     _send_file(bot, update.message.chat_id, out_file)
-    #
-    #     if debug:
-    #         _check_compression(in_file, out_file)
-    #
-    #     logging.info("Done processing {}".format(file))
-    #     os.remove(in_file)
-    #     os.remove(out_file)
-
-
 def download_files(text_links, web_address):
     file_names = []
     for file in text_links:

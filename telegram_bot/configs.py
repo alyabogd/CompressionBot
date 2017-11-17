@@ -7,7 +7,7 @@ class Config:
     HOW_TO_USE = """
     Just send me any txt file and I will compress it. 
     But if you send me an \'in\' file, I will decompress it. That's how I work.
-    /scan web-address - will scan given url and compress all txt files found
+    /scan web-address - will scan given url and compress all txt files found into singe archive file
      """
 
     UNKNOWN_COMMAND_MESSAGE = "Sorry, I don't understand this command"
