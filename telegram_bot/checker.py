@@ -2,7 +2,7 @@
 
 
 def get_text(file_name):
-    with open(file_name, "r") as inp:
+    with open(file_name, "rb") as inp:
         text = inp.readlines()
     return text
 

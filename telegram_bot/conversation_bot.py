@@ -80,16 +80,19 @@ def files_handler(bot, update):
 
 
 def _check_compression(full_files, compressed_file):
-    logging.debug("Checking  -> {}".format(compressed_file))
+    logging.info("Checking  -> {}".format(compressed_file))
+
+    for file in full_files:
+        os.rename(file, "i" + file)
     decompressed_names = _decompress(compressed_file)
 
-    for initial, decoded in zip(full_files, decompressed_names):
-        if files_equal(initial, decoded):
-            logging.debug("correct")
+    for decoded in decompressed_names:
+        if files_equal(decoded, "i" + decoded):
+            logging.info("correct")
         else:
-            logging.error("error found {} -> {}".format(initial, decoded))
+            logging.error("error found {} -> {}".format("i" + decoded, decoded))
 
-        os.remove(decoded)
+        os.remove("i" + decoded)
 
 
 def web_page_handler(bot, update, args):
